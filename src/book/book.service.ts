@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './book.entity';
 import { CreateBookDTO } from './dto/create-book.dto';
 import { BookRepository } from './book.repository';
+import { log } from 'console';
 
 @Injectable()
 export class BookService 
@@ -20,6 +21,14 @@ export class BookService
         if (!orderedBook) 
         {
             throw new NotFoundException('Book not found');
+        }
+        const { owner } = createBookDto;
+        let users = await this.bookRepository
+            .createQueryBuilder('book')
+            .where('book.ownerId = :ownerId', { ownerId: owner })
+            .getCount();
+        if (users == 5){
+            throw new NotFoundException('User allready has 5 books');
         }
         return this.bookRepository.orderBook(createBookDto, orderedBook);
     }
