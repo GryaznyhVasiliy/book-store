@@ -51,7 +51,6 @@ export class BookService
             .andWhere('book.id = :id', {id: bookId })
             .getCount();
 
-        log(book);
         if(!book)
         {
             throw new NotFoundException('User doesnt own this book');
