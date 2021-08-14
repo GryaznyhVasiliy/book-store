@@ -61,6 +61,10 @@ export class UserService
         {
             throw new NotFoundException('User not found');
         }
+        if (subscribedUser.subscribe)
+        {
+            throw new NotFoundException('User allready subscribed');
+        }
         return this.userRepository.getSubscription(subscribedUser);
     }
 
