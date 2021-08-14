@@ -22,14 +22,17 @@ export class BookService
         {
             throw new NotFoundException('Book not found');
         }
+
         const { owner } = createBookDto;
         let users = await this.bookRepository
             .createQueryBuilder('book')
             .where('book.ownerId = :ownerId', { ownerId: owner })
             .getCount();
+
         if (users == 5){
             throw new NotFoundException('User allready has 5 books');
         }
+
         return this.bookRepository.orderBook(createBookDto, orderedBook);
     }
 
@@ -40,6 +43,20 @@ export class BookService
         {
             throw new NotFoundException('Book not found');
         }
+
+        const { owner } = createBookDto;
+        let book = await this.bookRepository
+            .createQueryBuilder('book')
+            .where('book.ownerId = :ownerId', { ownerId: owner })
+            .andWhere('book.id = :id', {id: bookId })
+            .getCount();
+
+        log(book);
+        if(!book)
+        {
+            throw new NotFoundException('User doesnt own this book');
+        }
+
         return this.bookRepository.stopOrderBook(createBookDto, stopOrderedBook);
     }
 }
