@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './book.entity';
 import { CreateBookDTO } from './dto/create-book.dto';
 import { BookRepository } from './book.repository';
-import { log } from 'console';
+import { IsNull, Not } from 'typeorm';
 
 @Injectable()
 export class BookService 
@@ -29,10 +29,22 @@ export class BookService
             .where('book.ownerId = :ownerId', { ownerId: owner })
             .getCount();
 
-        if (users == 5){
+        if (users == 5)
+        {
             throw new NotFoundException('User allready has 5 books');
         }
 
+        let owners = await this.bookRepository.findOne({
+            where: {
+                id: bookId,
+                owner: Not(IsNull())
+            }
+        });
+        if(owners)
+        {
+            throw new NotFoundException('Book has allready been taken');
+        }
+        
         return this.bookRepository.orderBook(createBookDto, orderedBook);
     }
 
